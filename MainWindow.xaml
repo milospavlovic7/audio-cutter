@@ -1,0 +1,413 @@
+<Window x:Class="AudioCutterApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AudioCutterApp"
+        mc:Ignorable="d"
+        Title="Audio Cutter - Automatsko i Custom Skraćivanje Pesama" 
+        Height="780" Width="1040"
+        MinHeight="600" MinWidth="800"
+        WindowStartupLocation="CenterScreen"
+        Background="#18191C"
+        Foreground="#E0E0E0"
+        FontFamily="Segoe UI"
+        AllowDrop="True"
+        Drop="Window_Drop"
+        DragOver="Window_DragOver">
+
+    <Window.Resources>
+        <!-- Modern Dark Theme Styles -->
+        <SolidColorBrush x:Key="CardBackground" Color="#222328"/>
+        <SolidColorBrush x:Key="CardBorder" Color="#32343D"/>
+        <SolidColorBrush x:Key="AccentColor" Color="#3B82F6"/>
+        <SolidColorBrush x:Key="AccentHover" Color="#2563EB"/>
+        <SolidColorBrush x:Key="SuccessColor" Color="#10B981"/>
+        <SolidColorBrush x:Key="DangerColor" Color="#EF4444"/>
+
+        <!-- Button Style -->
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#2D3039"/>
+            <Setter Property="Foreground" Value="#F3F4F6"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#3F424E"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#3B3F4A"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#202227"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Opacity" Value="0.4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Primary Button Style -->
+        <Style x:Key="PrimaryButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Background" Value="#2563EB"/>
+            <Setter Property="BorderBrush" Value="#1D4ED8"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#1D4ED8"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#1E40AF"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Opacity" Value="0.4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- TextBox Style -->
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="#2A2C34"/>
+            <Setter Property="Foreground" Value="#F3F4F6"/>
+            <Setter Property="CaretBrush" Value="#60A5FA"/>
+            <Setter Property="BorderBrush" Value="#3E424F"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                CornerRadius="5">
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#3B82F6"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- CheckBox Style -->
+        <Style TargetType="CheckBox">
+            <Setter Property="Foreground" Value="#E5E7EB"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <!-- Header & Folder Selection -->
+            <RowDefinition Height="Auto"/>
+            <!-- Settings Card -->
+            <RowDefinition Height="Auto"/>
+            <!-- Files Grid -->
+            <RowDefinition Height="*"/>
+            <!-- Progress & Actions -->
+            <RowDefinition Height="Auto"/>
+            <!-- Logs Expander -->
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 1. HEADER & FOLDER SELECTION -->
+        <Border Grid.Row="0" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource CardBorder}" 
+                BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,0,14">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Title & DragDrop Hint -->
+                <Grid Grid.Row="0" Margin="0,0,0,10">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="🎵 Audio Cutter" FontSize="18" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center"/>
+                        <TextBlock Text="— grupno uklanjanje tišine i custom sečenje pesama" FontSize="13" Foreground="#9CA3AF" VerticalAlignment="Center" Margin="10,2,0,0"/>
+                    </StackPanel>
+                    <TextBlock Text="💡 Možete prevući (Drag &amp; Drop) folder ovde" HorizontalAlignment="Right" FontSize="12" Foreground="#60A5FA" VerticalAlignment="Center"/>
+                </Grid>
+
+                <!-- Folder Input Row -->
+                <Grid Grid.Row="1" Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox x:Name="TxtSourceFolder" 
+                             Text="Kliknite na 'Izaberi folder' ili prevucite folder sa pesmama..." 
+                             Foreground="#9CA3AF" FontSize="13" VerticalContentAlignment="Center" Margin="0,0,10,0"
+                             KeyDown="TxtSourceFolder_KeyDown" LostFocus="TxtSourceFolder_LostFocus"/>
+
+                    <Button x:Name="BtnSelectFolder" Grid.Column="1" Content="📁 Izaberi folder" Click="BtnSelectFolder_Click" Margin="0,0,8,0" Height="36"/>
+                    <Button Grid.Column="2" Content="🔄 Osveži" Click="BtnRefresh_Click" Height="36"/>
+                </Grid>
+
+                <!-- Output Folder Preview & Stats -->
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="Odredište (CUT folder): " FontWeight="SemiBold" Foreground="#9CA3AF" FontSize="12"/>
+                        <TextBlock x:Name="TxtOutputFolderPreview" Text="Nije selektovano" Foreground="#10B981" FontWeight="Medium" FontSize="12"/>
+                    </StackPanel>
+
+                    <TextBlock x:Name="TxtFileCount" Grid.Column="1" Text="0 pesama pronađeno" Foreground="#9CA3AF" FontSize="12" VerticalAlignment="Center"/>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- 2. SETTINGS / MODE OPTIONS CARD -->
+        <Border Grid.Row="1" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource CardBorder}" 
+                BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,0,14">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Mode Selector (Radio buttons) -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,14">
+                    <TextBlock Text="Izaberite opciju sečenja:" FontWeight="Bold" FontSize="14" Foreground="#FFFFFF" VerticalAlignment="Center" Margin="0,0,24,0"/>
+                    
+                    <RadioButton x:Name="RbSilenceMode" Content="1. Automatsko uklanjanje tišine (Silence Cut)" 
+                                 IsChecked="True" GroupName="CutModeGroup" Foreground="#E5E7EB" 
+                                 FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,24,0"
+                                 Checked="RbMode_Changed"/>
+                    
+                    <RadioButton x:Name="RbCustomMode" Content="2. Prilagođeni rez u sekundama (Custom Cut)" 
+                                 GroupName="CutModeGroup" Foreground="#E5E7EB" 
+                                 FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"
+                                 Checked="RbMode_Changed"/>
+                </StackPanel>
+
+                <!-- Panels Container -->
+                <Grid Grid.Row="1">
+                    <!-- Panel 1: Silence Detection Options -->
+                    <Border x:Name="PanelSilence" Background="#1D1E24" BorderBrush="#2C2E38" BorderThickness="1" CornerRadius="6" Padding="14">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <WrapPanel Grid.Row="0" Margin="0,0,0,10">
+                                <CheckBox x:Name="ChkSilenceStart" Content="Skloni detektovanu tišinu na POČETKU fajla" 
+                                          IsChecked="True" Margin="0,0,30,6"/>
+                                <CheckBox x:Name="ChkSilenceEnd" Content="Skloni detektovanu tišinu na KRAJU fajla" 
+                                          IsChecked="True" Margin="0,0,30,6"/>
+                            </WrapPanel>
+
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="Osetljivost tišine:" VerticalAlignment="Center" Foreground="#9CA3AF" Margin="0,0,10,0"/>
+                                <Slider x:Name="SliderSilenceDb" Grid.Column="1" Minimum="-80" Maximum="-20" Value="-50" 
+                                        TickFrequency="5" IsSnapToTickEnabled="True" VerticalAlignment="Center" Margin="0,0,8,0"
+                                        ValueChanged="SliderSilenceDb_ValueChanged"/>
+                                <TextBlock x:Name="TxtSilenceDbVal" Grid.Column="2" Text="-50 dB" Width="55" VerticalAlignment="Center" Foreground="#60A5FA" FontWeight="Bold"/>
+
+                                <TextBlock Grid.Column="3" Text="Min. trajanje tišine:" VerticalAlignment="Center" Foreground="#9CA3AF" Margin="20,0,10,0"/>
+                                <TextBox x:Name="TxtMinSilenceDuration" Grid.Column="4" Text="0.10" Width="60" TextAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="5" Text="s (preporučeno: 0.10s)" VerticalAlignment="Center" Foreground="#6B7280" Margin="8,0,0,0" FontSize="11"/>
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <!-- Panel 2: Custom Cut Options -->
+                    <Border x:Name="PanelCustom" Background="#1D1E24" BorderBrush="#2C2E38" BorderThickness="1" CornerRadius="6" Padding="14" Visibility="Collapsed">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0" Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="40"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Cut from start -->
+                                <TextBlock Grid.Column="0" Text="Iseci sa POČETKA:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#E5E7EB" Margin="0,0,10,0"/>
+                                <TextBox x:Name="TxtCutStartSec" Grid.Column="1" Text="5.000" FontSize="14" FontWeight="Bold" Foreground="#60A5FA" TextAlignment="Right" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="2" Text="sekundi" VerticalAlignment="Center" Foreground="#9CA3AF" Margin="6,0,0,0"/>
+
+                                <!-- Cut from end -->
+                                <TextBlock Grid.Column="4" Text="Iseci sa KRAJA:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#E5E7EB" Margin="0,0,10,0"/>
+                                <TextBox x:Name="TxtCutEndSec" Grid.Column="5" Text="0.000" FontSize="14" FontWeight="Bold" Foreground="#60A5FA" TextAlignment="Right" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="6" Text="sekundi" VerticalAlignment="Center" Foreground="#9CA3AF" Margin="6,0,0,0"/>
+                            </Grid>
+
+                            <TextBlock Grid.Row="1" Text="ℹ️ Unos je u sekundama sa milisekundnom preciznošću (npr. 5.000 = tačno 5 sekundi, 1.250 = 1 sekunda i 250 milisekundi). Ako stavite 0.000, ta strana se ne seče." 
+                                       Foreground="#9CA3AF" FontSize="11" FontStyle="Italic"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- Stream Copy / Quality toggle -->
+                <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10,0,0">
+                    <CheckBox x:Name="ChkFastStreamCopy" Content="Ekspresno sečenje bez rekompresije (Stream Copy - instant brzo)" 
+                              IsChecked="False" FontSize="12" Foreground="#9CA3AF"/>
+                    <TextBlock Text="— ISKLJUČENO = maksimalna preciznost na milisekundu uz visok kvalitet (preporučeno)" 
+                               FontSize="11" Foreground="#6B7280" Margin="8,2,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- 3. AUDIO FILES LIST -->
+        <Border Grid.Row="2" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource CardBorder}" 
+                BorderThickness="1" CornerRadius="8" Padding="1" Margin="0,0,0,14">
+            <DataGrid x:Name="GridFiles" AutoGenerateColumns="False" CanUserAddRows="False"
+                      Background="Transparent" RowBackground="#1E1F24" AlternatingRowBackground="#24262D"
+                      Foreground="#E5E7EB" BorderThickness="0" GridLinesVisibility="Horizontal"
+                      HorizontalGridLinesBrush="#2D2F38" HeadersVisibility="Column"
+                      ScrollViewer.CanContentScroll="True" SelectionMode="Single">
+                <DataGrid.Resources>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="#282A33"/>
+                        <Setter Property="Foreground" Value="#9CA3AF"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="FontSize" Value="12"/>
+                        <Setter Property="Padding" Value="10,8"/>
+                        <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                        <Setter Property="BorderBrush" Value="#32343D"/>
+                    </Style>
+                    <Style TargetType="DataGridCell">
+                        <Setter Property="Padding" Value="10,6"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="DataGridCell">
+                                    <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </DataGrid.Resources>
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Naziv fajla" Binding="{Binding FileName}" Width="2.5*" FontWeight="Medium"/>
+                    <DataGridTextColumn Header="Trajanje" Binding="{Binding DurationFormatted}" Width="100"/>
+                    <DataGridTemplateColumn Header="Status" Width="140">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border CornerRadius="4" Padding="6,2" HorizontalAlignment="Left">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Status}" Value="Završeno">
+                                                    <Setter Property="Background" Value="#064E3B"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Status}" Value="Čeka">
+                                                    <Setter Property="Background" Value="#374151"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Status}" Value="Sečenje u toku...">
+                                                    <Setter Property="Background" Value="#1E3A8A"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Status}" Value="Detektujem tišinu...">
+                                                    <Setter Property="Background" Value="#78350F"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <TextBlock Text="{Binding Status}" FontSize="11" FontWeight="SemiBold" Foreground="#F3F4F6"/>
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Detalji obrade" Binding="{Binding Details}" Width="3*" Foreground="#9CA3AF"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <!-- 4. PROGRESS & ACTION BAR -->
+        <Grid Grid.Row="3" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Progress Info -->
+            <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,20,0">
+                <Grid Margin="0,0,0,4">
+                    <TextBlock x:Name="TxtCurrentAction" Text="Spremno za rad" FontSize="12" Foreground="#9CA3AF"/>
+                    <TextBlock x:Name="TxtPercent" Text="0%" HorizontalAlignment="Right" FontSize="12" FontWeight="Bold" Foreground="#60A5FA"/>
+                </Grid>
+                <ProgressBar x:Name="ProgressBarWork" Height="8" Minimum="0" Maximum="100" Value="0" 
+                             Foreground="#3B82F6" Background="#26272F" BorderThickness="0"/>
+            </StackPanel>
+
+            <!-- Action Buttons -->
+            <Button x:Name="BtnOpenFolder" Grid.Column="1" Content="📂 Otvori CUT folder" Click="BtnOpenFolder_Click" 
+                    IsEnabled="False" Margin="0,0,10,0" Height="40"/>
+            <Button x:Name="BtnCancel" Grid.Column="2" Content="🛑 Otkaži" Click="BtnCancel_Click" 
+                    IsEnabled="False" Margin="0,0,10,0" Height="40"/>
+            <Button x:Name="BtnStart" Grid.Column="3" Style="{StaticResource PrimaryButton}" 
+                    Content="▶️ Pokreni obradu" Click="BtnStart_Click" Height="40" Padding="24,0"/>
+        </Grid>
+
+        <!-- 5. LOG / DNEVNIK EXPANDER -->
+        <Expander Grid.Row="4" Header="Dnevnik obrade (Logs)" Foreground="#9CA3AF" FontSize="12">
+            <Border Background="#121316" BorderBrush="#252730" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,6,0,0">
+                <TextBox x:Name="TxtLogs" Height="100" Background="Transparent" Foreground="#A1A1AA" 
+                         BorderThickness="0" IsReadOnly="True" VerticalScrollBarVisibility="Auto" 
+                         FontFamily="Consolas" FontSize="11" TextWrapping="Wrap"/>
+            </Border>
+        </Expander>
+    </Grid>
+</Window>

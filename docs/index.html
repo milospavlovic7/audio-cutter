@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio Cutter - Batch Audio Trimming & Processing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #09090b;
+      --card: #18181b;
+      --border: #27272a;
+      --accent: #06b6d4;
+      --accent-hover: #22d3ee;
+      --text: #fafafa;
+      --muted: #a1a1aa;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.5rem;
+    }
+    .container {
+      max-width: 720px;
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 3rem 2.5rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      text-align: center;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      background: rgba(6, 182, 212, 0.15);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      color: #67e8f9;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+    }
+    h1 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #ffffff 40%, #67e8f9 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    p.lead {
+      color: var(--muted);
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 2.5rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+      text-align: left;
+    }
+    .feature-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+    .feature-card h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      color: #fff;
+    }
+    .feature-card p {
+      font-size: 0.825rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    .formats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+    .format-pill {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.6rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted);
+    }
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 1.75rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #09090b;
+    }
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="badge">Windows Audio Utility</div>
+    <h1>Audio Cutter</h1>
+    <p class="lead">Fast, batch audio slicing and trimming utility powered by FFmpeg and .NET WPF.</p>
+
+    <div class="grid">
+      <div class="feature-card">
+        <h3>⚡ Lossless Trimming</h3>
+        <p>Slice audio files instantaneously without quality loss using high-speed stream copying.</p>
+      </div>
+      <div class="feature-card">
+        <h3>📁 Batch Processing</h3>
+        <p>Load entire directories of audio tracks and process them concurrently with full cancellation support.</p>
+      </div>
+      <div class="feature-card">
+        <h3>📊 Real-Time Logs</h3>
+        <p>Track processing time, output bitrates, and execution stages with comprehensive live diagnostic logs.</p>
+      </div>
+    </div>
+
+    <div class="formats">
+      <span class="format-pill">MP3</span>
+      <span class="format-pill">WAV</span>
+      <span class="format-pill">FLAC</span>
+      <span class="format-pill">M4A</span>
+      <span class="format-pill">AAC</span>
+      <span class="format-pill">OGG</span>
+      <span class="format-pill">OPUS</span>
+      <span class="format-pill">AIFF</span>
+    </div>
+
+    <div class="btn-row">
+      <a href="https://github.com/milospavlovic7/audio-cutter" class="btn btn-primary">
+        View on GitHub
+      </a>
+      <a href="https://github.com/milospavlovic7/audio-cutter/releases" class="btn btn-secondary">
+        Download Latest Release
+      </a>
+    </div>
+  </div>
+</body>
+</html>
